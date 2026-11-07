@@ -36,7 +36,7 @@ Con el entorno virtual activado y el paquete instalado:
 python -m websocket_engine
 ```
 
-El servicio queda en `http://127.0.0.1:8000`. Otro puerto:
+El servicio queda en `http://127.0.0.1:8000`. Swagger del HTTP: `http://127.0.0.1:8000/docs`. Otro puerto:
 
 ```powershell
 python -m websocket_engine --port 9000

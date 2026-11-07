@@ -16,7 +16,7 @@ Intermediario en un proceso. El cliente abre una sesión Socket.IO con su licenc
 - `ghostbus.connection` — acepta la conexión solo si hay licencia y la mete en una sala con ese nombre.
 - `ghostbus.bus` — contrato `deliver(license_key, message) -> destinatarios`.
 - `ghostbus.socketio_bus` — implementa el bus emitiendo el evento `message` a la sala de la licencia.
-- `ghostbus.app` — HTTP `POST /send`.
+- `ghostbus.app` — HTTP `POST /send` y OpenAPI/Swagger en `/docs`.
 - `ghostbus.server` — monta Socket.IO sobre FastAPI. ASGI de entrada: `ghostbus.server:app`.
 - `ghostbus.runtime` — arranca Uvicorn sobre ese ASGI.
 - `websocket_engine` — punto de entrada `python -m websocket_engine`.
@@ -54,5 +54,7 @@ Content-Type: application/json
 - 200 `{ "delivered": N }`
 - 404 `{ "detail": "license not connected" }`
 - 422 si faltan `to` o `message`
+
+OpenAPI: `GET /openapi.json`. Swagger UI: `GET /docs`. ReDoc: `GET /redoc`.
 
 Arranque: `python -m websocket_engine` (Uvicorn en `0.0.0.0:8000`). Puerto: `--port`.
