@@ -1,0 +1,12 @@
+.git
+.venv
+.pytest_cache
+.cursor
+**/__pycache__
+*.egg-info
+tests
+dist
+.coverage
+README.md
+Project.md
+AGENTS.md

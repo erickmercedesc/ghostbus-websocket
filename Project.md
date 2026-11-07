@@ -59,3 +59,5 @@ Content-Type: application/json
 OpenAPI: `GET /openapi.json`. Swagger UI: `GET /docs`. ReDoc: `GET /redoc`.
 
 Arranque: `python -m websocket_engine` (Uvicorn en `0.0.0.0:8000`). Puerto: `--port`.
+
+Docker: imagen `public.ecr.aws/docker/library/python:3.12-slim` que instala el paquete y corre `python -m websocket_engine` en el puerto 8000. Compose: servicio `websocket_engine` publicado en `8000:8000`.

@@ -42,6 +42,19 @@ El servicio queda en `http://127.0.0.1:8000`. Swagger del HTTP: `http://127.0.0.
 python -m websocket_engine --port 9000
 ```
 
+## Docker
+
+```powershell
+docker compose up --build
+```
+
+El servicio queda en `http://127.0.0.1:8000`. Sin Compose:
+
+```powershell
+docker build -t ghostbussocket .
+docker run --rm -p 8000:8000 ghostbussocket
+```
+
 ## Cliente Socket.IO
 
 ```python
