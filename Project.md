@@ -55,4 +55,4 @@ Content-Type: application/json
 - 404 `{ "detail": "license not connected" }`
 - 422 si faltan `to` o `message`
 
-Arranque: `python -m websocket_engine` (Uvicorn en `0.0.0.0:8000`).
+Arranque: `python -m websocket_engine` (Uvicorn en `0.0.0.0:8000`). Puerto: `--port`.

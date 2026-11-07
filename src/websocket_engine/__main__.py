@@ -1,4 +1,4 @@
-from ghostbus.runtime import run
+from ghostbus.runtime import main
 
 if __name__ == "__main__":
-    run()
+    main()

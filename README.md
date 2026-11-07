@@ -36,7 +36,11 @@ Con el entorno virtual activado y el paquete instalado:
 python -m websocket_engine
 ```
 
-El servicio queda en `http://127.0.0.1:8000`.
+El servicio queda en `http://127.0.0.1:8000`. Otro puerto:
+
+```powershell
+python -m websocket_engine --port 9000
+```
 
 ## Cliente Socket.IO
 
