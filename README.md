@@ -1,6 +1,6 @@
 # GhostBusSocket
 
-Servicio Python que recibe clientes por Socket.IO y les envía mensajes por HTTP. Cada cliente se identifica con `X-License-Key` (header o query string). `POST /send` entrega el texto a todas las conexiones de esa licencia.
+Servicio Python que recibe clientes por Socket.IO y les envía mensajes por HTTP. Cada cliente se identifica con `X-License-Key` (header o query string). `POST /send` entrega `{ "message", "data" }` a todas las conexiones de esa licencia.
 
 Requiere Python 3.11 o superior.
 
@@ -71,13 +71,19 @@ Instala el cliente con `pip install python-socketio`.
 POST /send
 Content-Type: application/json
 
-{ "to": "abc123", "message": "Hello World" }
+{ "to": "abc123", "message": "Hello World", "data": "123456" }
+```
+
+`data` es opcional. El cliente Socket.IO recibe:
+
+```json
+{ "message": "Hello World", "data": "123456" }
 ```
 
 Desde PowerShell:
 
 ```powershell
-Invoke-RestMethod -Uri http://127.0.0.1:8000/send -Method Post -ContentType "application/json" -Body '{"to":"abc123","message":"Hello World"}'
+Invoke-RestMethod -Uri http://127.0.0.1:8000/send -Method Post -ContentType "application/json" -Body '{"to":"abc123","message":"Hello World","data":"123456"}'
 ```
 
 - 200 `{ "delivered": N }`

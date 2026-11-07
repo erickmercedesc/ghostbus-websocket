@@ -2,13 +2,13 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from ghostbus.bus import MessageBus
+from ghostbus.payload import ClientPayload
 
 LICENSE_NOT_CONNECTED = "license not connected"
 
 
-class SendBody(BaseModel):
+class SendBody(ClientPayload):
     to: str = Field(description="X-License-Key of the connected Socket.IO clients")
-    message: str = Field(description="Text delivered to every connection of that license")
 
 
 class SendResult(BaseModel):
@@ -25,7 +25,7 @@ def create_http_app(bus: MessageBus) -> FastAPI:
         description=(
             "HTTP-to-Socket.IO intermediary. "
             "Clients connect with X-License-Key. "
-            "POST /send delivers the text to every connection of that license."
+            "POST /send delivers {message, data} to every connection of that license."
         ),
         version="0.1.0",
     )
@@ -42,7 +42,8 @@ def create_http_app(bus: MessageBus) -> FastAPI:
         summary="Send a message to a license",
     )
     async def send(body: SendBody) -> SendResult:
-        delivered = await bus.deliver(body.to, body.message)
+        payload = ClientPayload(message=body.message, data=body.data)
+        delivered = await bus.deliver(body.to, payload)
         if delivered == 0:
             raise HTTPException(status_code=404, detail=LICENSE_NOT_CONNECTED)
         return SendResult(delivered=delivered)

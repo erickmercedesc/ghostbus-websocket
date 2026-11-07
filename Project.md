@@ -4,18 +4,19 @@ Centro de la verdad de la arquitectura de GhostBusSocket. Describir aquí el sis
 
 ## Estado
 
-Servicio Python: FastAPI y python-socketio en un ASGI. Los clientes Socket.IO se identifican con `X-License-Key`. `POST /send` entrega el mismo texto a todas las conexiones de esa licencia.
+Servicio Python: FastAPI y python-socketio en un ASGI. Los clientes Socket.IO se identifican con `X-License-Key`. `POST /send` entrega `{ "message", "data" }` a todas las conexiones de esa licencia.
 
 ## Qué hace
 
-Intermediario en un proceso. El cliente abre una sesión Socket.IO con su licencia. Otro llamador hace `POST /send` con `{ "to", "message" }`. El servidor emite `message` a la sala de esa licencia.
+Intermediario en un proceso. El cliente abre una sesión Socket.IO con su licencia. Otro llamador hace `POST /send` con `{ "to", "message", "data" }`. El servidor emite el evento `message` con `{ "message", "data" }` a la sala de esa licencia.
 
 ## Módulos
 
 - `ghostbus.identity` — lee `X-License-Key` del header y, si falta, del query string. Una sola regla para Socket.IO y para el environ de conexión.
 - `ghostbus.connection` — acepta la conexión solo si hay licencia y la mete en una sala con ese nombre.
-- `ghostbus.bus` — contrato `deliver(license_key, message) -> destinatarios`.
-- `ghostbus.socketio_bus` — implementa el bus emitiendo el evento `message` a la sala de la licencia.
+- `ghostbus.payload` — JSON que llega al cliente: `{ "message", "data" }`.
+- `ghostbus.bus` — contrato `deliver(license_key, payload) -> destinatarios`.
+- `ghostbus.socketio_bus` — implementa el bus emitiendo el evento `message` con ese JSON a la sala de la licencia.
 - `ghostbus.app` — HTTP `POST /send` y OpenAPI/Swagger en `/docs`.
 - `ghostbus.server` — monta Socket.IO sobre FastAPI. ASGI de entrada: `ghostbus.server:app`.
 - `ghostbus.runtime` — arranca Uvicorn sobre ese ASGI.
@@ -26,9 +27,9 @@ Intermediario en un proceso. El cliente abre una sesión Socket.IO con su licenc
 1. El cliente Socket.IO conecta a `/` con `X-License-Key` en header o en query.
 2. Si no hay licencia, la conexión se rechaza.
 3. Si hay licencia, el `sid` entra en la sala de ese valor. Varias conexiones de la misma licencia conviven.
-4. `POST /send` con `{ "to": "<licencia>", "message": "<texto>" }` cuenta los participantes de esa sala.
+4. `POST /send` con `{ "to": "<licencia>", "message": "<texto>" }` y `data` opcional cuenta los participantes de esa sala.
 5. Si no hay ninguno, responde 404 `license not connected`.
-6. Si hay, emite el evento Socket.IO `message` con el texto a esa sala y responde `{ "delivered": N }`.
+6. Si hay, emite el evento Socket.IO `message` con `{ "message", "data" }` a esa sala y responde `{ "delivered": N }`.
 
 El registro de salas vive en el proceso. Al reiniciar, las conexiones se pierden.
 
@@ -40,7 +41,7 @@ Socket.IO:
 
 - URL: `http://<host>/` (Engine.IO/Socket.IO, no un WebSocket crudo).
 - Header `X-License-Key` o `?X-License-Key=`.
-- Evento recibido: `message`, payload string.
+- Evento recibido: `message`, payload `{ "message": "hello world" }` y `data` solo si vino en el POST.
 
 HTTP:
 
@@ -48,12 +49,12 @@ HTTP:
 POST /send
 Content-Type: application/json
 
-{ "to": "abc123", "message": "Hello World" }
+{ "to": "abc123", "message": "Hello World", "data": "123456" }
 ```
 
 - 200 `{ "delivered": N }`
 - 404 `{ "detail": "license not connected" }`
-- 422 si faltan `to` o `message`
+- 422 si faltan `to` o `message`. `data` es opcional.
 
 OpenAPI: `GET /openapi.json`. Swagger UI: `GET /docs`. ReDoc: `GET /redoc`.
 
